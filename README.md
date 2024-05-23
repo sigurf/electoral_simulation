@@ -50,7 +50,7 @@ Create a folder *name_of_new_law* with this structure:
 
 ## Credits
 
-+ First release of framework and FPTP electoral law: Sigurd Fagerholt and Bharat Premkumar.
++ First release of framework and FPTP electoral law: Sigurd Fagerholt [@sigurf] (https://github.com/sigurf/) and Bharat Premkumar [@BharatPremkumar] (https://github.com/BharatPremkumar).
 
 
 ## Contributing
