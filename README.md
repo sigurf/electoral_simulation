@@ -54,7 +54,7 @@ Create a folder *name of new law* with this structure:
         + party_color_csv: *csv containing colors per party* (see Norwegian_party_colors.csv)
         + map_json: *json feature_collection map of with same counties as rest of data* (see Norway_map.json)
 
-Add additional data to the Data-folder if useful.
+Add additional data and maps to the Data-folder if useful.
 
 Support-folder contains Tools-class with some useful static methods which can be useful when generating election outcome of new electoral systems.
 
