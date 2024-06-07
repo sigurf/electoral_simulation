@@ -1,0 +1,6 @@
+name: "Norwegian parliament election 2021"
+data:
+  vote_data_csv: Norwegian_parliament_election_2021
+  mandate_data_csv: Norwegian_mandates_per_county
+  party_color_csv: Norwegian_party_colors
+  map_json: Norway_map
