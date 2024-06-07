@@ -41,10 +41,10 @@ python Run LawName
 Create a folder *name of new law* with this structure:
 + Classes: contains classes for data analysis and visualization.
     + Election_Analyzer.py: contains the class Election_Analyzer which should inherit IELection_Analyzer forcing the class to contain the following methods:
-        + get_vote_data(): returns the dataframe of the votes per party per county (see Norwegian_parliament_election_2021.csv)
-        + get_mandate_data(): returns the dataframe for the counties and how many mandates they choose (see Norwegian_mandates_per_county.csv)
-        + get_color_data(): returns the dataframe for the parties and their colors in hex code (see Norwegian_party_colors.csv)
-        + get_mandate_distribution(): returns the dataframe of the mandates per party per county. Should be with colums [County, Party, Mandates]
+        + get_vote_data():  returns the dataframe of the votes per party per county (from vote_data_csv).
+        + get_mandate_data(): returns the dataframe for the counties and how many mandates they choose (from mandate_data_csv).
+        + get_color_data(): returns the dataframe for the parties and their colors in hex code (from party_color_csv).
+        + get_mandate_distribution(): returns the dataframe of the mandates per party per county. Should be with colums [County, Party, Mandates].
     + Optional: other classes to support the class Election_Analyzer.
 + Instances: contains information about the data used for an instance. Each instance should have the following structure:
     + name: *name of instance of data*
