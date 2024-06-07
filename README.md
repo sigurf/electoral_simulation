@@ -9,7 +9,6 @@
 - **Usage**
 - **Setup**
 - **Credits**
-- **Contributing**
 
 
 ## Description
@@ -46,6 +45,7 @@ Create a folder *name of new law* with this structure:
         + get_color_data(): returns the dataframe for the parties and their colors in hex code (from party_color_csv).
         + get_mandate_distribution(): returns the dataframe of the mandates per party per county. Should be with colums [County, Party, Mandates].
     + Optional: other classes to support the class Election_Analyzer.
+
 + Instances: contains information about the data used for an instance. Each instance should have the following structure:
     + name: *name of instance of data*
     + data:
@@ -54,7 +54,9 @@ Create a folder *name of new law* with this structure:
         + party_color_csv: *csv containing colors per party* (see Norwegian_party_colors.csv)
         + map_json: *json feature_collection map of with same counties as rest of data* (see Norway_map.json)
 
-Add additional data to the Data-folder if useful.s
+Add additional data to the Data-folder if useful.
+
+Support-folder contains Tools-class with some useful static methods which can be useful when generating election outcome of new electoral systems.
 
 
 ## Credits
@@ -62,8 +64,3 @@ Add additional data to the Data-folder if useful.s
 First release of framework, FPTP electoral law and Modified Sainte-Laguë method: Sigurd Fagerholt [@sigurf] (https://github.com/sigurf/) and Bharat Premkumar [@BharatPremkumar] (https://github.com/BharatPremkumar).
 
 Framework structure is inspired by Lorenzo Ruffati [@LRuffati] (https://github.com/LRuffati/SimulatoreSistemiElettorali).
-
-
-## Contributing
-
-Pull requests are welcome.
