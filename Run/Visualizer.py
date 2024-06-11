@@ -40,9 +40,9 @@ class Visualizer:
         self.color_data = ea.get_color_data()
 
 
-        # Dataframes for all parties and counties
-        self.parties = self.vote_data[self.vote_data["County"] == self.vote_data.loc[0]["County"]]["Party"]
-        self.counties = self.mandate_data["County"]
+        # Dataframes for all parties and districts
+        self.parties = self.vote_data[self.vote_data["District"] == self.vote_data.loc[0]["District"]]["Party"]
+        self.districts = self.mandate_data["District"]
 
         self.party_colors = Tools.find_party_colors(self.color_data)
 
@@ -57,7 +57,7 @@ class Visualizer:
 
 
     """
-        Visualizes the vote distribution and each counties winner using an interactive map.
+        Visualizes the vote distribution and each districts winner using an interactive map.
     """
     def show_maps(self):
         maps = [self.get_vote_map(), self.get_mandate_map()]
@@ -68,75 +68,75 @@ class Visualizer:
         
 
     """
-        Interactive map with information about the votes of each county.
+        Interactive map with information about the votes of each district.
 
-        @return         map of counties containing the voting data.
+        @return         map of districts containing the voting data.
         @return         layout of the map.
     """
     def get_vote_map(self):
 
-        # Specifies value and label appearing when hovering over county
+        # Specifies value and label appearing when hovering over district
         total_votes = []
         vote_distribution = []
-        for county_index in range(len(self.counties)):
+        for district_index in range(len(self.districts)):
 
-            # Value is total number of votes in county
-            county = self.counties[county_index]
-            total_votes_in_county = Tools.find_total_votes(self.vote_data, county)
-            total_votes.append(total_votes_in_county)
+            # Value is total number of votes in district
+            district = self.districts[district_index]
+            total_votes_in_district = Tools.find_total_votes(self.vote_data, district)
+            total_votes.append(total_votes_in_district)
 
-            # Label with each party's votes in the county hovered over
-            label =f"<b>{county}: {total_votes[county_index]}</b><br>"
+            # Label with each party's votes in the district hovered over
+            label =f"<b>{district}: {total_votes[district_index]}</b><br>"
             for party in self.parties:
-                total_votes_to_party_in_county = Tools.find_total_votes(self.vote_data, county, party)
-                label += f"{party}: {total_votes_to_party_in_county}<br>"
+                total_votes_to_party_in_district = Tools.find_total_votes(self.vote_data, district, party)
+                label += f"{party}: {total_votes_to_party_in_district}<br>"
             vote_distribution.append(label)
 
         # Creates map with data showing how the votes are distributed
-        vote_map = go.Choropleth(z=total_votes, geojson=self.geo_map, locations=self.counties,
+        vote_map = go.Choropleth(z=total_votes, geojson=self.geo_map, locations=self.districts,
                                 colorscale="Peach",
                                 colorbar_title="Total amount of votes",
                                 featureidkey='properties.name',
                                 hoverinfo = 'text',
                                 text=vote_distribution
                             )
-        vote_map_layout = go.Layout(title = "<b>" + self.instance + "</b><br><br>Total votes by county and votes to party by county")
+        vote_map_layout = go.Layout(title = "<b>" + self.instance + "</b><br><br>Total votes by district and votes to party by district")
         return vote_map, vote_map_layout
 
 
     """
-        Interactive map showing the party with most votes in each county, and how many mandates
+        Interactive map showing the party with most votes in each district, and how many mandates
         the party receive.
 
-        @return         map of counties showing the party with most votes and the mandates they receive.
+        @return         map of districts showing the party with most votes and the mandates they receive.
         @return         layout of the map.
     """
     def get_mandate_map(self):
 
-        # Specifies value and label appearing when hovering over county
+        # Specifies value and label appearing when hovering over district
         total_mandates = []
         mandate_distribution = []
         colors = []
-        for county_index in range(len(self.counties)):
+        for district_index in range(len(self.districts)):
 
-            # Value is the total number of mandates in each county
-            county = self.counties[county_index]
-            total_mandates.append(self.mandate_data[self.mandate_data['County'] == county]['Mandates'].values[0])
+            # Value is the total number of mandates in each district
+            district = self.districts[district_index]
+            total_mandates.append(self.mandate_data[self.mandate_data['District'] == district]['Mandates'].values[0])
             
-            # The label consists of number of mandates each party receives in each county
-            label =f"<b>{county}: {total_mandates[county_index]}</b><br>"
-            county_mandate_distribution = self.mandate_distribution[self.mandate_distribution['County'] == county][['Party', 'Mandates']]
-            for _, row in county_mandate_distribution.iterrows():
+            # The label consists of number of mandates each party receives in each district
+            label =f"<b>{district}: {total_mandates[district_index]}</b><br>"
+            district_mandate_distribution = self.mandate_distribution[self.mandate_distribution['District'] == district][['Party', 'Mandates']]
+            for _, row in district_mandate_distribution.iterrows():
                 if row['Mandates'] > 0:
                     label += f"{row['Party']}: {row['Mandates']}<br>"
             mandate_distribution.append(label)
 
 
-            # The county is shown in the most popular party's color
-            colors.append(self.party_colors[self.parties[self.parties == Tools.find_most_popular_party(self.vote_data, county)].index[0]])
+            # The district is shown in the most popular party's color
+            colors.append(self.party_colors[self.parties[self.parties == Tools.find_most_popular_party(self.vote_data, district)].index[0]])
 
         # Creates map with data showing how the mandates are distributed according to FPTP
-        mandate_map = go.Choropleth(z=colors, geojson=self.geo_map, locations=self.counties,
+        mandate_map = go.Choropleth(z=colors, geojson=self.geo_map, locations=self.districts,
                                 colorscale="Rainbow",
                                 zmin=0,
                                 zmax=1,
@@ -145,7 +145,7 @@ class Visualizer:
                                 showscale=False,
                                 text=mandate_distribution
                             )
-        mandate_map_layout = go.Layout(title = "<b>" + self.instance + "</b><br><br>Party receiving mandates from county using " + self.electoral_system)
+        mandate_map_layout = go.Layout(title = "<b>" + self.instance + "</b><br><br>Party receiving mandates from district using " + self.electoral_system)
         return mandate_map, mandate_map_layout
        
 
@@ -154,7 +154,7 @@ class Visualizer:
     """
     def show_parliament_distribution(self):
         
-        # Retrieves national mandate distribution from mandate distribution per county
+        # Retrieves national mandate distribution from mandate distribution per district
         parliament_distribution = {}
         for _, row in self.mandate_distribution.iterrows():
             party = row['Party']

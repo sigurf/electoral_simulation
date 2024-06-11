@@ -6,38 +6,38 @@ import pandas as pd
 class Tools:
         
     """
-        Retrieves number of votes. Either in total, on one party, in one county or in one party in one county.
+        Retrieves number of votes. Either in total, on one party, in one district or in one party in one district.
 
         @param  vote_data   dataframe used to find total votes
-        @param  county      name of the county to retrieve the votes from. Value None if all counties should
+        @param  district      name of the district to retrieve the votes from. Value None if all districts should
                             be selected. Default value None.
         @param  party       name of the party to retrieve the votes for. Value None if all parties should
                             be selected. Default value None.
-        @return             number of votes for the specified party in the specified county. All parties or counties if parameter is None.
+        @return             number of votes for the specified party in the specified district. All parties or districts if parameter is None.
     """
     @staticmethod
-    def find_total_votes(vote_data, county = None, party = None):
-        if county == None and party == None:
+    def find_total_votes(vote_data, district = None, party = None):
+        if district == None and party == None:
             return vote_data['Votes'].sum()
-        elif county == None:
+        elif district == None:
             return vote_data.loc[vote_data['Party'] == party, 'Votes'].sum()
         elif party == None:
-            return vote_data.loc[vote_data['County'] == county, 'Votes'].sum()
+            return vote_data.loc[vote_data['District'] == district, 'Votes'].sum()
         else:
-            return vote_data[(vote_data['County'] == county) & (vote_data['Party'] == party)]['Votes'].values[0]
+            return vote_data[(vote_data['District'] == district) & (vote_data['Party'] == party)]['Votes'].values[0]
     
 
     """
-        Retrieves the party with most votes in the specified county.
+        Retrieves the party with most votes in the specified district.
 
         @param  vote_data   dataframe used to find total votes
-        @param  county  name of the county to find the most popular party.
-        @return         name of the party with most votes in the county. 
+        @param  district  name of the district to find the most popular party.
+        @return         name of the party with most votes in the district. 
     """
     @staticmethod
-    def find_most_popular_party(vote_data, county):
-        votes_from_county = vote_data[vote_data["County"] == county]
-        max_index = votes_from_county["Votes"].idxmax()
+    def find_most_popular_party(vote_data, district):
+        votes_from_district = vote_data[vote_data["District"] == district]
+        max_index = votes_from_district["Votes"].idxmax()
         return vote_data.loc[max_index]["Party"]
     
 
@@ -78,15 +78,15 @@ class Tools:
     """
         Converts mandate distribution from dict on to pandas dataframe. 
         
-        @param  mandate_distribution_dict   dictionary showing how the mandates should be distributed for parties and counties.
+        @param  mandate_distribution_dict   dictionary showing how the mandates should be distributed for parties and districts.
                                             Dictionary must be on form:    {
-                                                                                County1: [party1_mandates, party2_mandates, ..., partyN_mandates],
-                                                                                County2: [party1_mandates, ..., partyN_mandates],
+                                                                                District1: [party1_mandates, party2_mandates, ..., partyN_mandates],
+                                                                                District2: [party1_mandates, ..., partyN_mandates],
                                                                                 ... 
-                                                                                CountyM: [party1_mandates, ..., partyN_mandates]
+                                                                                DistrictM: [party1_mandates, ..., partyN_mandates]
                                                                             } 
         @param  party_list                  list of all participating parties ordered alphabetically.
-        @return                             pandas dataframe with columns:  [County, Party, Mandates].    
+        @return                             pandas dataframe with columns:  [District, Party, Mandates].    
     """
     @staticmethod
     def dict_to_df(mandate_distribution_dict, party_list):
@@ -94,10 +94,10 @@ class Tools:
         # Initialize an empty row
         row = []
 
-        # Iterate over each county and list in the dictionary
-        for county, vote_list in mandate_distribution_dict.items():
+        # Iterate over each district and list in the dictionary
+        for district, vote_list in mandate_distribution_dict.items():
             for i in range(len(vote_list)):
-                row.append((county, party_list[i], vote_list[i]))
+                row.append((district, party_list[i], vote_list[i]))
 
         # Create a pandas dataFrame from the list of tuples
-        return pd.DataFrame(row, columns=['County', 'Party', 'Mandates'])  
+        return pd.DataFrame(row, columns=['District', 'Party', 'Mandates'])  

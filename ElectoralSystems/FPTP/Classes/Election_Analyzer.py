@@ -19,51 +19,51 @@ class Election_Analyzer(IElection_Analyzer):
         self.mandate_data = Tools.create_dataframe(instance["data"]["mandate_data_csv"] + ".csv")
         self.color_data = Tools.create_dataframe(instance["data"]["party_color_csv"] + ".csv")
         
-        # Dataframes for all parties and counties
-        self.parties = self.vote_data[self.vote_data["County"] == self.vote_data.loc[0]["County"]]["Party"]
-        self.counties = self.mandate_data["County"]
+        # Dataframes for all parties and districts
+        self.parties = self.vote_data[self.vote_data["District"] == self.vote_data.loc[0]["District"]]["Party"]
+        self.districts = self.mandate_data["District"]
 
-        # Distributed mandates (per county) using the FPTP electoral system
+        # Distributed mandates (per district) using the FPTP electoral system
         mandate_distribution = self.find_mandate_distribution()
         self.df = Tools.dict_to_df(mandate_distribution, self.parties)
         
 
 
     """
-        Calculates how the mandates are distributed among the parties for each county.
+        Calculates how the mandates are distributed among the parties for each district.
 
-        @return         a dictionary {county: [mandates_party1, ... , mandates_partyN], ...} with the mandates per party per county.
-                        Both the counties and the parties are organised in alphabetical order (as in the data files).
+        @return         a dictionary {district: [mandates_party1, ... , mandates_partyN], ...} with the mandates per party per district.
+                        Both the districts and the parties are organised in alphabetical order (as in the data files).
     """
     def find_mandate_distribution(self):
-        mandate_distribution_by_county = {}
+        mandate_distribution_by_district = {}
         mandate_distribution = {}
 
-        # Iterates over counties and finds party with most votes
+        # Iterates over districts and finds party with most votes
         for _, row_data in self.mandate_data.iterrows():
-            county = row_data["County"]
-            mandate_distribution_by_county[county] = [0]*len(self.parties)
+            district = row_data["District"]
+            mandate_distribution_by_district[district] = [0]*len(self.parties)
 
 
             # Find party with most votes in party and the number of mandates they will receive
-            party_receiving_all_mandates = Tools.find_most_popular_party(self.vote_data, county)
-            mandates_from_county = self.mandate_data[self.mandate_data["County"] == county]["Mandates"].values[0]
+            party_receiving_all_mandates = Tools.find_most_popular_party(self.vote_data, district)
+            mandates_from_district = self.mandate_data[self.mandate_data["District"] == district]["Mandates"].values[0]
             
-            # Add county-winner's mandates to the party's total mandates
+            # Add district-winner's mandates to the party's total mandates
             if party_receiving_all_mandates in mandate_distribution:
-                mandate_distribution[party_receiving_all_mandates] += mandates_from_county
+                mandate_distribution[party_receiving_all_mandates] += mandates_from_district
             else:
-                mandate_distribution[party_receiving_all_mandates] = mandates_from_county
+                mandate_distribution[party_receiving_all_mandates] = mandates_from_district
             
-            # Add county-winner's mandates to party's mandates from county.
+            # Add district-winner's mandates to party's mandates from district.
             # All other parties receives zero votes.
             for i in range(len(self.parties)):
                 if self.parties[i] == party_receiving_all_mandates:
-                    mandate_distribution_by_county[county][i] = mandates_from_county
+                    mandate_distribution_by_district[district][i] = mandates_from_district
         
         # Sort parties receiving mandates alphabetically.
         mandate_distribution = dict(sorted(mandate_distribution.items()))
-        return mandate_distribution_by_county
+        return mandate_distribution_by_district
     
 
     # Getters
@@ -71,8 +71,8 @@ class Election_Analyzer(IElection_Analyzer):
     def get_vote_data(self):
         return self.vote_data
     
-    def get_counties(self):
-        return self.counties
+    def get_districts(self):
+        return self.districts
     
     def get_parties(self):
         return self.parties

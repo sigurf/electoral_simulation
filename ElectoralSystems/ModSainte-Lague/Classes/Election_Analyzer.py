@@ -19,39 +19,39 @@ class Election_Analyzer(IElection_Analyzer):
         self.mandate_data = Tools.create_dataframe(instance["data"]["mandate_data_csv"] + ".csv")
         self.color_data = Tools.create_dataframe(instance["data"]["party_color_csv"] + ".csv")
         
-        # Dataframes for all parties and counties
-        self.parties = self.vote_data[self.vote_data["County"] == self.vote_data.loc[0]["County"]]["Party"]
-        self.counties = self.mandate_data["County"]
+        # Dataframes for all parties and districts
+        self.parties = self.vote_data[self.vote_data["District"] == self.vote_data.loc[0]["District"]]["Party"]
+        self.districts = self.mandate_data["District"]
 
-        # Distributed mandates (per county) using the FPTP electoral system
+        # Distributed mandates (per district) using the FPTP electoral system
         mandate_distribution = self.find_mandate_distribution()
 
         self.df = Tools.dict_to_df(mandate_distribution, self.parties)
 
 
     """
-        Calculates how the mandates are distributed among the parties for each county.
+        Calculates how the mandates are distributed among the parties for each district.
 
-        @return         a dictionary {county: [mandates_party1, ... , mandates_partyN], ...} with the mandates per party per county.
-                        Both the counties and the parties are organised in alphabetical order (as in the data files).
+        @return         a dictionary {district: [mandates_party1, ... , mandates_partyN], ...} with the mandates per party per district.
+                        Both the districts and the parties are organised in alphabetical order (as in the data files).
     """
     def find_mandate_distribution(self):
         mandate_distribution = self.find_district_mandate_distribution()        
-        distribution_by_county = mandate_distribution[0]
+        distribution_by_district = mandate_distribution[0]
         national_distribution = mandate_distribution[1]
         levelling_mandates = self.find_levelling_mandates(national_distribution)
-        party_ratio = [0]*len(self.parties)*len(self.counties)
-        for i in range(len(self.counties)):
+        party_ratio = [0]*len(self.parties)*len(self.districts)
+        for i in range(len(self.districts)):
             for j in range(len(self.parties)):
-                party_ratio[len(self.parties)*i + j] = int(levelling_mandates[self.parties[j]] > 0) * 2 * (mandate_distribution[0][self.counties[i]][j] + 1)  / Tools.find_total_votes(self.vote_data, self.counties[i]) / int(self.mandate_data[self.mandate_data["County"] == self.counties[i]]["Mandates"].values[0])
+                party_ratio[len(self.parties)*i + j] = int(levelling_mandates[self.parties[j]] > 0) * 2 * (mandate_distribution[0][self.districts[i]][j] + 1)  / Tools.find_total_votes(self.vote_data, self.districts[i]) / int(self.mandate_data[self.mandate_data["District"] == self.districts[i]]["Mandates"].values[0])
         mandates_to_party = {}
-        for _ in range(len(self.counties)):
+        for _ in range(len(self.districts)):
 
-            # Find county and party with highest ratio
+            # Find district and party with highest ratio
             max_ratio = max(party_ratio)
             max_index = party_ratio.index(max_ratio)
-            county_index = max_index // len(self.parties)
-            county = self.counties[county_index]
+            district_index = max_index // len(self.parties)
+            district = self.districts[district_index]
             party_index = max_index % len(self.parties)
             party_receiving_mandate = self.parties[party_index]
 
@@ -60,25 +60,25 @@ class Election_Analyzer(IElection_Analyzer):
                 mandates_to_party[party_receiving_mandate] = 0
             mandates_to_party[party_receiving_mandate] += 1
 
-            # Make sure county cannot distribute more than one mandate
-            for index in range(county_index * len(self.parties), (county_index + 1) * len(self.parties)):
+            # Make sure district cannot distribute more than one mandate
+            for index in range(district_index * len(self.parties), (district_index + 1) * len(self.parties)):
                 party_ratio[index] = 0
             
             # Make sure party cannot receive more mandates than they should
             if mandates_to_party[party_receiving_mandate] == levelling_mandates[party_receiving_mandate]:
-                for index in range(len(self.counties)):
+                for index in range(len(self.districts)):
                     party_ratio[index*len(self.parties) + party_index] = 0
-            distribution_by_county[county][party_index] += 1
+            distribution_by_district[district][party_index] += 1
         
         for party in self.parties:
             national_distribution[party] += levelling_mandates[party]
-        return distribution_by_county
+        return distribution_by_district
 
     """
-        Calculates how the DISTRICT mandates are distributed among the parties for each county.
+        Calculates how the DISTRICT mandates are distributed among the parties for each district.
 
-        @return         a dictionary {county: [mandates_party1, ... , mandates_partyN], ...} with the mandates per party per county.
-                        Both the counties and the parties are organised in alphabetical order (as in the data files).
+        @return         a dictionary {district: [mandates_party1, ... , mandates_partyN], ...} with the mandates per party per district.
+                        Both the districts and the parties are organised in alphabetical order (as in the data files).
     """
     def find_district_mandate_distribution(self):
 
@@ -90,50 +90,50 @@ class Election_Analyzer(IElection_Analyzer):
         for i in range(len(votes)):
             votes.at[i, "Votes"] /= 1.4
 
-        # Look at one county at the time
+        # Look at one district at the time
         mandate_distribution = {}
-        for county in self.counties:
-            mandate_distribution[county] = [0]*len(self.parties)
-            votes_from_county = votes[votes["County"] == county]
+        for district in self.districts:
+            mandate_distribution[district] = [0]*len(self.parties)
+            votes_from_district = votes[votes["District"] == district]
 
-            # Distribute all the county's mandates except one (levelling mandate) one by one by selecting the party with currently highest vote count in the county
-            for _ in range(int(self.mandate_data[self.mandate_data["County"] == county]["Mandates"].iloc[0]) - 1):
+            # Distribute all the district's mandates except one (levelling mandate) one by one by selecting the party with currently highest vote count in the district
+            for _ in range(int(self.mandate_data[self.mandate_data["District"] == district]["Mandates"].iloc[0]) - 1):
 
-                # Find party with most votes in the county currently
-                max_index = votes_from_county["Votes"].idxmax()
-                party_receiving_mandate = votes_from_county.loc[max_index]["Party"]
+                # Find party with most votes in the district currently
+                max_index = votes_from_district["Votes"].idxmax()
+                party_receiving_mandate = votes_from_district.loc[max_index]["Party"]
                 party_receiving_mandate_index = next(i for i in range(len(self.parties)) if self.parties.loc[i] == party_receiving_mandate)
 
                 # Divide the vote count as the party receives mandates. First 1.4, then 3, 5, 7...
-                mandates_already_received = mandate_distribution[county][party_receiving_mandate_index]
+                mandates_already_received = mandate_distribution[district][party_receiving_mandate_index]
                 if mandates_already_received == 0:
-                    votes_from_county.at[max_index, "Votes"] *= 1.4/3
+                    votes_from_district.at[max_index, "Votes"] *= 1.4/3
                 else:
-                    votes_from_county.at[max_index, "Votes"] *= (1 + 2*mandates_already_received) / (3 + 2*mandates_already_received)
+                    votes_from_district.at[max_index, "Votes"] *= (1 + 2*mandates_already_received) / (3 + 2*mandates_already_received)
 
-                # Add mandate to party with currently most votes in county
-                mandate_distribution[county][party_receiving_mandate_index] += 1
+                # Add mandate to party with currently most votes in district
+                mandate_distribution[district][party_receiving_mandate_index] += 1
 
-        # Retrieves national mandate distribution from mandate distribution per county
+        # Retrieves national mandate distribution from mandate distribution per district
         national_mandate_distribution = {}
         for i in range(len(self.parties)):
             national_mandate_distribution[self.parties[i]] = 0
-            for county in mandate_distribution.keys():
-                national_mandate_distribution[self.parties[i]] += mandate_distribution[county][i]
+            for district in mandate_distribution.keys():
+                national_mandate_distribution[self.parties[i]] += mandate_distribution[district][i]
         return mandate_distribution, national_mandate_distribution
 
 
     """
-        Calculates how the LEVELLING mandates are distributed among the parties for each county.
+        Calculates how the LEVELLING mandates are distributed among the parties for each district.
 
-        @return         a dictionary {county: [mandates_party1, ... , mandates_partyN], ...} with the mandates per party per county.
-                        Both the counties and the parties are organised in alphabetical order (as in the data files).
+        @return         a dictionary {district: [mandates_party1, ... , mandates_partyN], ...} with the mandates per party per district.
+                        Both the districts and the parties are organised in alphabetical order (as in the data files).
     """
     def find_levelling_mandates(self, mandates_from_district, overrepresented_parties = []):
         
         """ National mandate distribution
-                - Like find_district_mandate_distribution() but with the entire nation as one district, not for each county. 
-                - Gives the correct number of levelling mandates per county, but not from which county they come from.
+                - Like find_district_mandate_distribution() but with the entire nation as one district, not for each district. 
+                - Gives the correct number of levelling mandates per district, but not from which district they come from.
         """
 
         # All votes in country
@@ -180,7 +180,7 @@ class Election_Analyzer(IElection_Analyzer):
             mandate_distribution[party_receiving_mandate] += 1
 
         """ Levelling mandate allocation
-                - Determines which counties the levelling mandates comes from.
+                - Determines which districts the levelling mandates comes from.
         """
 
         # Add levelling mandates to party and mark overrepresented parties
@@ -204,8 +204,8 @@ class Election_Analyzer(IElection_Analyzer):
     def get_vote_data(self):
         return self.vote_data
     
-    def get_counties(self):
-        return self.counties
+    def get_districts(self):
+        return self.districts
     
     def get_parties(self):
         return self.parties
