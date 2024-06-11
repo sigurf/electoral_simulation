@@ -3,7 +3,7 @@ from IElection_Analyzer import IElection_Analyzer # type: ignore
 
 
 """
-    Class containing all analysis done on the election data specified by the instance according to the Modified Saint-Laguë method.
+    Class containing all analysis done on the election data specified by the instance according to the Modified Sainte-Laguë method.
 """
 class Election_Analyzer(IElection_Analyzer):
 
