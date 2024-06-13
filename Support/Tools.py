@@ -44,14 +44,14 @@ class Tools:
     """
         Calculates the hue value (0-1) of the rgb color of each party.
 
-        @param  color_data  dataframe with parties and their colors in hex code
+        @param  party_data  dataframe with party info including their color in hex code.
         @return             an array of the hue value of the parties' colors, where the
                             parties are in alphabetical order (as in the data file).
     """
     @staticmethod
-    def find_party_colors(color_data):
+    def find_party_colors(party_data):
         colors = []
-        for _, row_data in color_data.iterrows():
+        for _, row_data in party_data.iterrows():
             hex_color = row_data["Color"]
             r = int(hex_color[1:3], 16) / 255.0
             g = int(hex_color[3:5], 16) / 255.0

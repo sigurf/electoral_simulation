@@ -15,7 +15,7 @@ class IElection_Analyzer(ABC):
         pass
 
     @abstractmethod
-    def get_color_data(self):
+    def get_party_data(self):
         pass
 
     @abstractmethod

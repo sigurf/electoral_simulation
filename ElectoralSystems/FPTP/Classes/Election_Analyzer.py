@@ -8,7 +8,7 @@ from IElection_Analyzer import IElection_Analyzer # type: ignore
 class Election_Analyzer(IElection_Analyzer):
 
     """
-        Initializes the Election Analyzer object holding all useful information.
+        Initializes the Election Analyzer object holding all useful information including a pandas dataframe of the final parliament distribution.
 
         @param  instance  a loaded yaml-file found in the Instances directory, specifying the data used.
     """
@@ -17,7 +17,7 @@ class Election_Analyzer(IElection_Analyzer):
         # Dataframes for the raw data found in the instance
         self.vote_data = Tools.create_dataframe(instance["data"]["vote_data_csv"] + ".csv")
         self.mandate_data = Tools.create_dataframe(instance["data"]["mandate_data_csv"] + ".csv")
-        self.color_data = Tools.create_dataframe(instance["data"]["party_color_csv"] + ".csv")
+        self.party_data = Tools.create_dataframe(instance["data"]["party_data_csv"] + ".csv")
         
         # Dataframes for all parties and districts
         self.parties = self.vote_data[self.vote_data["District"] == self.vote_data.loc[0]["District"]]["Party"]
@@ -77,8 +77,8 @@ class Election_Analyzer(IElection_Analyzer):
     def get_parties(self):
         return self.parties
     
-    def get_color_data(self):
-        return self.color_data
+    def get_party_data(self):
+        return self.party_data
     
     def get_party_colors(self):
         return self.party_colors

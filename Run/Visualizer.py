@@ -37,14 +37,13 @@ class Visualizer:
         # Unprocessed dataframes
         self.vote_data = ea.get_vote_data()
         self.mandate_data = ea.get_mandate_data()
-        self.color_data = ea.get_color_data()
-
+        self.party_data = ea.get_party_data()
 
         # Dataframes for all parties and districts
         self.parties = self.vote_data[self.vote_data["District"] == self.vote_data.loc[0]["District"]]["Party"]
         self.districts = self.mandate_data["District"]
 
-        self.party_colors = Tools.find_party_colors(self.color_data)
+        self.party_colors = Tools.find_party_colors(self.party_data)
 
         # Dataframe of parliament mandate distribution for the given electoral system and instance
         self.mandate_distribution = ea.get_mandate_distribution()
@@ -89,7 +88,7 @@ class Visualizer:
             label =f"<b>{district}: {total_votes[district_index]}</b><br>"
             for party in self.parties:
                 total_votes_to_party_in_district = Tools.find_total_votes(self.vote_data, district, party)
-                label += f"{party}: {total_votes_to_party_in_district}<br>"
+                label += f"{self.party_data[self.party_data["Party"] == party]["EnglishName"].values[0]}: {total_votes_to_party_in_district}<br>"
             vote_distribution.append(label)
 
         # Creates map with data showing how the votes are distributed
@@ -128,7 +127,7 @@ class Visualizer:
             district_mandate_distribution = self.mandate_distribution[self.mandate_distribution['District'] == district][['Party', 'Mandates']]
             for _, row in district_mandate_distribution.iterrows():
                 if row['Mandates'] > 0:
-                    label += f"{row['Party']}: {row['Mandates']}<br>"
+                    label += f"{self.party_data[self.party_data["Party"] == row['Party']]["EnglishName"].values[0]}: {row['Mandates']}<br>"
             mandate_distribution.append(label)
 
 
@@ -157,6 +156,7 @@ class Visualizer:
         # Retrieves national mandate distribution from mandate distribution per district
         parliament_distribution = {}
         for _, row in self.mandate_distribution.iterrows():
+            #party = self.party_data[self.party_data["Party"] == row['Party']]["EnglishName"].values[0]
             party = row['Party']
             mandates = row['Mandates']
             if mandates > 0:
@@ -168,11 +168,15 @@ class Visualizer:
         parliament_distribution = {party: parliament_distribution[party] for party in sorted(parliament_distribution, key=str.lower)}
         
         # Extracts lists from dictionary
-        labels = list(parliament_distribution.keys())
+        parties = list(parliament_distribution.keys())
         values = list(parliament_distribution.values())
 
         # Allocates the correct color to the parties
-        colors = self.color_data[self.color_data["Party"].isin(labels)]["Color"].tolist()
+        colors = self.party_data[self.party_data["Party"].isin(parties)]["Color"].tolist()
+
+        # Create label of English name of parties
+        labels = [self.party_data[self.party_data["Party"] == party]["EnglishName"].values[0] for party in parties]
+
 
         # Visualizes pie chart showing parliament distribution
         fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors=colors))], layout=go.Layout(title="<b>" + self.instance + "</b><br><br>Parties in the parliament using " + self.electoral_system))

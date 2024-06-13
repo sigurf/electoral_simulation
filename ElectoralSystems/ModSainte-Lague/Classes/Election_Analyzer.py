@@ -8,7 +8,7 @@ from IElection_Analyzer import IElection_Analyzer # type: ignore
 class Election_Analyzer(IElection_Analyzer):
 
     """
-        Initializes the Election Analyzer object holding all useful information.
+        Initializes the Election Analyzer object holding all useful information including a pandas dataframe of the final parliament distribution.
 
         @param  instance  a loaded yaml-file found in the Instances directory, specifying the data used.
     """
@@ -17,7 +17,7 @@ class Election_Analyzer(IElection_Analyzer):
         # Dataframes for the raw data found in the instance
         self.vote_data = Tools.create_dataframe(instance["data"]["vote_data_csv"] + ".csv")
         self.mandate_data = Tools.create_dataframe(instance["data"]["mandate_data_csv"] + ".csv")
-        self.color_data = Tools.create_dataframe(instance["data"]["party_color_csv"] + ".csv")
+        self.party_data = Tools.create_dataframe(instance["data"]["party_data_csv"] + ".csv")
         
         # Dataframes for all parties and districts
         self.parties = self.vote_data[self.vote_data["District"] == self.vote_data.loc[0]["District"]]["Party"]
@@ -42,8 +42,9 @@ class Election_Analyzer(IElection_Analyzer):
         levelling_mandates = self.find_levelling_mandates(national_distribution)
         party_ratio = [0]*len(self.parties)*len(self.districts)
         for i in range(len(self.districts)):
+            district_factor = Tools.find_total_votes(self.vote_data, self.districts[i]) / (int(self.mandate_data[self.mandate_data["District"] == self.districts[i]]["Mandates"].values[0]) - 1)
             for j in range(len(self.parties)):
-                party_ratio[len(self.parties)*i + j] = int(levelling_mandates[self.parties[j]] > 0) * 2 * (mandate_distribution[0][self.districts[i]][j] + 1)  / Tools.find_total_votes(self.vote_data, self.districts[i]) / int(self.mandate_data[self.mandate_data["District"] == self.districts[i]]["Mandates"].values[0])
+                party_ratio[len(self.parties)*i + j] = int(levelling_mandates[self.parties[j]] > 0) * Tools.find_total_votes(self.vote_data, self.districts[i], self.parties[j]) / (2 * mandate_distribution[0][self.districts[i]][j] + 1)  / district_factor
         mandates_to_party = {}
         for _ in range(len(self.districts)):
 
@@ -210,8 +211,8 @@ class Election_Analyzer(IElection_Analyzer):
     def get_parties(self):
         return self.parties
     
-    def get_color_data(self):
-        return self.color_data
+    def get_party_data(self):
+        return self.party_data
     
     def get_party_colors(self):
         return self.party_colors
