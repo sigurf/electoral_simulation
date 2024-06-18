@@ -11,7 +11,7 @@ class IElection_Analyzer(ABC):
         pass
 
     @abstractmethod
-    def get_mandate_data(self):
+    def get_district_data(self):
         pass
 
     @abstractmethod

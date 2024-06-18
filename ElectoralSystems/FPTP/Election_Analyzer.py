@@ -15,13 +15,11 @@ class Election_Analyzer(IElection_Analyzer):
     def __init__(self, instance):
 
         # Dataframes for the raw data found in the instance
-        self.vote_data = Tools.create_dataframe(instance["data"]["vote_data_csv"] + ".csv")
-        self.mandate_data = Tools.create_dataframe(instance["data"]["mandate_data_csv"] + ".csv")
-        self.party_data = Tools.create_dataframe(instance["data"]["party_data_csv"] + ".csv")
+        self.vote_data, self.district_data, self.party_data = Tools.create_dataframes(instance)
         
         # Dataframes for all parties and districts
         self.parties = self.vote_data[self.vote_data["District"] == self.vote_data.loc[0]["District"]]["Party"]
-        self.districts = self.mandate_data["District"]
+        self.districts = self.district_data["District"]
 
         # Distributed mandates (per district) using the FPTP electoral system
         mandate_distribution = self.find_mandate_distribution()
@@ -40,14 +38,14 @@ class Election_Analyzer(IElection_Analyzer):
         mandate_distribution = {}
 
         # Iterates over districts and finds party with most votes
-        for _, row_data in self.mandate_data.iterrows():
+        for _, row_data in self.district_data.iterrows():
             district = row_data["District"]
             mandate_distribution_by_district[district] = [0]*len(self.parties)
 
 
             # Find party with most votes in party and the number of mandates they will receive
             party_receiving_all_mandates = Tools.find_most_popular_party(self.vote_data, district)
-            mandates_from_district = self.mandate_data[self.mandate_data["District"] == district]["Mandates"].values[0]
+            mandates_from_district = self.district_data[self.district_data["District"] == district]["Mandates"].values[0]
             
             # Add district-winner's mandates to the party's total mandates
             if party_receiving_all_mandates in mandate_distribution:
@@ -83,8 +81,8 @@ class Election_Analyzer(IElection_Analyzer):
     def get_party_colors(self):
         return self.party_colors
 
-    def get_mandate_data(self):
-        return self.mandate_data
+    def get_district_data(self):
+        return self.district_data
     
     def get_mandate_distribution(self):
         return self.df

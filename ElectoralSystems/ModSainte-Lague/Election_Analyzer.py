@@ -15,13 +15,11 @@ class Election_Analyzer(IElection_Analyzer):
     def __init__(self, instance):
 
         # Dataframes for the raw data found in the instance
-        self.vote_data = Tools.create_dataframe(instance["data"]["vote_data_csv"] + ".csv")
-        self.mandate_data = Tools.create_dataframe(instance["data"]["mandate_data_csv"] + ".csv")
-        self.party_data = Tools.create_dataframe(instance["data"]["party_data_csv"] + ".csv")
+        self.vote_data, self.district_data, self.party_data = Tools.create_dataframes(instance)
         
         # Dataframes for all parties and districts
         self.parties = self.vote_data[self.vote_data["District"] == self.vote_data.loc[0]["District"]]["Party"]
-        self.districts = self.mandate_data["District"]
+        self.districts = self.district_data["District"]
 
         # Distributed mandates (per district) using the FPTP electoral system
         mandate_distribution = self.find_mandate_distribution()
@@ -42,7 +40,7 @@ class Election_Analyzer(IElection_Analyzer):
         levelling_mandates = self.find_levelling_mandates(national_distribution)
         party_ratio = [0]*len(self.parties)*len(self.districts)
         for i in range(len(self.districts)):
-            district_factor = Tools.find_total_votes(self.vote_data, self.districts[i]) / (int(self.mandate_data[self.mandate_data["District"] == self.districts[i]]["Mandates"].values[0]) - 1)
+            district_factor = Tools.find_total_votes(self.vote_data, self.districts[i]) / (int(self.district_data[self.district_data["District"] == self.districts[i]]["Mandates"].values[0]) - 1)
             for j in range(len(self.parties)):
                 party_ratio[len(self.parties)*i + j] = int(levelling_mandates[self.parties[j]] > 0) * Tools.find_total_votes(self.vote_data, self.districts[i], self.parties[j]) / (2 * mandate_distribution[0][self.districts[i]][j] + 1)  / district_factor
         mandates_to_party = {}
@@ -98,7 +96,7 @@ class Election_Analyzer(IElection_Analyzer):
             votes_from_district = votes[votes["District"] == district]
 
             # Distribute all the district's mandates except one (levelling mandate) one by one by selecting the party with currently highest vote count in the district
-            for _ in range(int(self.mandate_data[self.mandate_data["District"] == district]["Mandates"].iloc[0]) - 1):
+            for _ in range(int(self.district_data[self.district_data["District"] == district]["Mandates"].iloc[0]) - 1):
 
                 # Find party with most votes in the district currently
                 max_index = votes_from_district["Votes"].idxmax()
@@ -155,7 +153,7 @@ class Election_Analyzer(IElection_Analyzer):
             mandate_distribution[self.parties[i]] = 0
 
         # All mandates to be distributed. Mandates from overrepresented parties removed
-        total_mandates = self.mandate_data["Mandates"].sum()
+        total_mandates = self.district_data["Mandates"].sum()
         for party in overrepresented_parties:
             total_mandates -= mandates_from_district[party]
 
@@ -217,8 +215,8 @@ class Election_Analyzer(IElection_Analyzer):
     def get_party_colors(self):
         return self.party_colors
 
-    def get_mandate_data(self):
-        return self.mandate_data
+    def get_district_data(self):
+        return self.district_data
     
     def get_mandate_distribution(self):
         return self.df

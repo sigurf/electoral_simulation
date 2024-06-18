@@ -62,17 +62,21 @@ class Tools:
     
 
     """
-        Retrieves the data from the specified filepath.
+        Generates the dataframes (vote_data, district_data and party_data) of the specified instance.
 
-        @param  filepath    path of csv-file containing data (relative to the Data-directory).
-        @return             dataframe of csv-file using pandas.
+        @param  instance    a loaded yaml-file found in the Instances directory of the used electoral system, specifying the data used. 
+        @return             list of dataframes from csv-file (vote_data, district_data and party_data).
 
     """
     @staticmethod
-    def create_dataframe(filepath):
+    def create_dataframes(instance):
         current_directory = os.path.dirname(__file__)
-        csv_file_path = os.path.join(current_directory, "../Data/", filepath)
-        return pd.read_csv(csv_file_path)
+        dataframe_versions = ["Vote", "District", "Party"]
+        dataframes = []
+        for version in dataframe_versions:
+            csv_file_path = os.path.join(current_directory, "..", "Data", version + "Data", instance["data"][version.lower() + "_data_csv"] + ".csv")
+            dataframes.append(pd.read_csv(csv_file_path))
+        return dataframes
     
 
     """

@@ -26,7 +26,7 @@ class Visualizer:
         self.electoral_system = electoral_system
 
         # Adds the path to the electoral system to sys.path
-        electoral_system_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ElectoralSystems", electoral_system, "Classes"))
+        electoral_system_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "ElectoralSystems", electoral_system))
         sys.path.append(electoral_system_path)
         from Election_Analyzer import Election_Analyzer # type: ignore
         ea = Election_Analyzer(instance)
@@ -36,12 +36,12 @@ class Visualizer:
 
         # Unprocessed dataframes
         self.vote_data = ea.get_vote_data()
-        self.mandate_data = ea.get_mandate_data()
+        self.district_data = ea.get_district_data()
         self.party_data = ea.get_party_data()
 
         # Dataframes for all parties and districts
         self.parties = self.vote_data[self.vote_data["District"] == self.vote_data.loc[0]["District"]]["Party"]
-        self.districts = self.mandate_data["District"]
+        self.districts = self.district_data["District"]
 
         self.party_colors = Tools.find_party_colors(self.party_data)
 
@@ -120,7 +120,7 @@ class Visualizer:
 
             # Value is the total number of mandates in each district
             district = self.districts[district_index]
-            total_mandates.append(self.mandate_data[self.mandate_data['District'] == district]['Mandates'].values[0])
+            total_mandates.append(self.district_data[self.district_data['District'] == district]['Mandates'].values[0])
             
             # The label consists of number of mandates each party receives in each district
             label =f"<b>{district}: {total_mandates[district_index]}</b><br>"

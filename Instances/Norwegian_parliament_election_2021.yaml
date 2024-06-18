@@ -1,6 +1,6 @@
 name: "Norwegian parliament election 2021"
 data:
   vote_data_csv: Norwegian_parliament_election_2021
-  mandate_data_csv: Norwegian_mandates_per_district
+  district_data_csv: Norwegian_mandates_per_district
   party_data_csv: Norwegian_party_data
   map_json: Norway_map

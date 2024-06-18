@@ -11,26 +11,24 @@ from Visualizer import Visualizer
 """
 
 # Ensures that the command line argument is provided and is correct
-if len(sys.argv) != 2:
-    print("Error: Please provide the electoral system as a command line argument.")
+if len(sys.argv) != 3:
+    print("Error: Please provide the electoral system and election data instance as a command line argument.")
     sys.exit(1)
 
-# Retrieves the electoral system provided
+# Retrieves the electoral system and election data instance
 electoral_system = sys.argv[1]
+instance_name = sys.argv[2]
 
 # Finds directory with the electoral system's instances
 current_directory_path = os.path.dirname(__file__)
-instance_directory_path = os.path.join(current_directory_path, "..", "ElectoralSystems" , electoral_system, "Instances")
+instance_directory_path = os.path.join(current_directory_path, "..", "Instances", instance_name + ".yaml")
 
-# Runs simulation for each instance
-for f in os.scandir(instance_directory_path):
+# Loads instance
+file = open(instance_directory_path)
+instance = yaml.safe_load(file)
+file.close()
 
-    # Loads instance
-    file = open(f)
-    instance = yaml.safe_load(file)
-    file.close()
-    
-    # Runs simulation and visualizes the result
-    visualizer = Visualizer(electoral_system, instance)
-    visualizer.show_maps()
-    visualizer.show_parliament_distribution()
+# Runs simulation and visualizes the result
+visualizer = Visualizer(electoral_system, instance)
+visualizer.show_maps()
+visualizer.show_parliament_distribution()
