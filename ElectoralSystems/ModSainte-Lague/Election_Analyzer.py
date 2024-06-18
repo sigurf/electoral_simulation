@@ -10,7 +10,7 @@ class Election_Analyzer(IElection_Analyzer):
     """
         Initializes the Election Analyzer object holding all useful information including a pandas dataframe of the final parliament distribution.
 
-        @param  instance  a loaded yaml-file found in the Instances directory, specifying the data used.
+        @param  instance  a loaded json-file found in the Instances directory, specifying the data used.
     """
     def __init__(self, instance):
 

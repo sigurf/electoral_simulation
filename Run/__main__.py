@@ -1,6 +1,6 @@
-import yaml
 import os
 import sys
+import json
 
 from Visualizer import Visualizer
 
@@ -21,11 +21,11 @@ instance_name = sys.argv[2]
 
 # Finds directory with the electoral system's instances
 current_directory_path = os.path.dirname(__file__)
-instance_directory_path = os.path.join(current_directory_path, "..", "Instances", instance_name + ".yaml")
+instance_directory_path = os.path.join(current_directory_path, "..", "Instances", instance_name + ".json")
 
 # Loads instance
 file = open(instance_directory_path)
-instance = yaml.safe_load(file)
+instance = json.load(file)
 file.close()
 
 # Runs simulation and visualizes the result

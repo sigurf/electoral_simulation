@@ -64,7 +64,7 @@ class Tools:
     """
         Generates the dataframes (vote_data, district_data and party_data) of the specified instance.
 
-        @param  instance    a loaded yaml-file found in the Instances directory of the used electoral system, specifying the data used. 
+        @param  instance    a loaded json-file found in the Instances directory of the used electoral system, specifying the data used. 
         @return             list of dataframes from csv-file (vote_data, district_data and party_data).
 
     """

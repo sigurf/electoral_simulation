@@ -7,7 +7,9 @@
 - **Description**
 - **Installation**
 - **Usage**
-- **Setup**
+- **Adding new electoral systems**
+- **Adding new election data instances**
+
 - **Credits**
 
 
@@ -43,13 +45,15 @@ Create a folder *name of new electoral system* within the ElectoralSystems-folde
     + get_vote_data():  returns the dataframe of the votes per party per district (from vote_data_csv).
     + get_district_data(): returns the dataframe for the districts and how many mandates they choose (from district_data_csv).
     + get_party_data(): returns the dataframe for the English name of the parties and their colors in hex code (from party_data_csv).
-    + get_mandate_distribution(): returns the dataframe of the mandates per party per district. Should be with colums [District, Party, Mandates].
-+ Support classes: other classes to support the class Election_Analyzer. These are optional.
+    + get_mandate_distribution(): returns the result dataframe with mandates per party per district. Should be with colums [District, Party, Mandates].
++ Optional classes: other optional classes to support the class Election_Analyzer.
+
+Support-folder contains Tools-class with some static methods which can be useful when generating election outcome of new electoral systems.
 
 
 ## Adding new election data instances 
 
-Create a new yaml-file *name of new instance* within the Instances-folder containing the set of data files used for the instance. Each instance must have the following structure:
+Create a new json-file *name of new instance* within the Instances-folder containing the set of data files used for the instance. Each instance must have the following structure (see Norwegian_parliament_election_2021.json):
 + name: *name of instance of data*
 + data:
     + vote_data_csv: *csv containing votes per party per district* CSV-file from the VoteData-folder with columns: [Party, Party, Votes] (see Norwegian_parliament_election_2021.csv).
@@ -60,11 +64,6 @@ Create a new yaml-file *name of new instance* within the Instances-folder contai
 The data must correlate with each other, meaning the *vote_data_csv* must describe the votes from the districts in *district_data_csv* given to the parties in *party_data_csv*.
 
 Add additional data and maps to the Data-folder using the existing structure if needed for the instance.
-
-
-## Support
-
-Support-folder contains Tools-class with some static methods which can be useful when generating election outcome of new electoral systems.
 
 
 ## Credits

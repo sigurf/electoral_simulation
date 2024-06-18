@@ -19,7 +19,7 @@ class Visualizer:
         Initializes the Visualizer class.
 
         @param  electoral_system    a chosen electoral system to simulate the instance on
-        @param  instance            a loaded yaml-file found in the Instances directory, specifying the data used.
+        @param  instance            a loaded json-file found in the Instances directory, specifying the data used.
     """
     def __init__(self, electoral_system, instance):
 
