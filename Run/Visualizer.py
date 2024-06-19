@@ -4,8 +4,8 @@ import plotly.graph_objects as go
 import sys
 
 # Adds the path to Tools to sys.path
-tool_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Support"))
-sys.path.append(tool_path)
+support_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Support"))
+sys.path.append(support_path)
 from Tools import Tools # type: ignore
 
 
