@@ -35,12 +35,12 @@ class Visualizer:
         self.instance = instance["name"]
 
         # Unprocessed dataframes
-        self.vote_data = ea.get_vote_data()
+        self.election_data = ea.get_election_data()
         self.district_data = ea.get_district_data()
         self.party_data = ea.get_party_data()
 
         # Dataframes for all parties and districts
-        self.parties = self.vote_data[self.vote_data["District"] == self.vote_data.loc[0]["District"]]["Party"]
+        self.parties = self.election_data[self.election_data["District"] == self.election_data.loc[0]["District"]]["Party"]
         self.districts = self.district_data["District"]
 
         self.party_colors = Tools.find_party_colors(self.party_data)
@@ -81,13 +81,13 @@ class Visualizer:
 
             # Value is total number of votes in district
             district = self.districts[district_index]
-            total_votes_in_district = Tools.find_total_votes(self.vote_data, district)
+            total_votes_in_district = Tools.find_total_votes(self.election_data, district)
             total_votes.append(total_votes_in_district)
 
             # Label with each party's votes in the district hovered over
             label =f"<b>{district}: {total_votes[district_index]}</b><br>"
             for party in self.parties:
-                total_votes_to_party_in_district = Tools.find_total_votes(self.vote_data, district, party)
+                total_votes_to_party_in_district = Tools.find_total_votes(self.election_data, district, party)
                 label += f"{self.party_data[self.party_data["Party"] == party]["EnglishName"].values[0]}: {total_votes_to_party_in_district}<br>"
             vote_distribution.append(label)
 
@@ -132,7 +132,7 @@ class Visualizer:
 
 
             # The district is shown in the most popular party's color
-            colors.append(self.party_colors[self.parties[self.parties == Tools.find_most_popular_party(self.vote_data, district)].index[0]])
+            colors.append(self.party_colors[self.parties[self.parties == Tools.find_most_popular_party(self.election_data, district)].index[0]])
 
         # Creates map with data showing how the mandates are distributed according to FPTP
         mandate_map = go.Choropleth(z=colors, geojson=self.geo_map, locations=self.districts,

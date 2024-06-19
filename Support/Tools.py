@@ -71,10 +71,10 @@ class Tools:
     @staticmethod
     def create_dataframes(instance):
         current_directory = os.path.dirname(__file__)
-        dataframe_versions = ["Vote", "District", "Party"]
+        dataframe_versions = ["Election", "District", "Party"]
         dataframes = []
         for version in dataframe_versions:
-            csv_file_path = os.path.join(current_directory, "..", "Data", version + "Data", instance["data"][version.lower() + "_data_csv"] + ".csv")
+            csv_file_path = os.path.join(current_directory, "..", "Data", version + " Data", instance["data"][version.lower() + "_data_csv"] + ".csv")
             dataframes.append(pd.read_csv(csv_file_path))
         return dataframes
     

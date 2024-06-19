@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 class IElection_Analyzer(ABC):
 
     @abstractmethod
-    def get_vote_data(self):
+    def get_election_data(self):
         pass
 
     @abstractmethod

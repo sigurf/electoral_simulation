@@ -56,12 +56,12 @@ Support-folder contains Tools-class with some static methods which can be useful
 Create a new json-file *name of new instance* within the Instances-folder containing the set of data files used for the instance. Each instance must have the following structure (see Norwegian_parliament_election_2021.json):
 + name: *name of instance of data*
 + data:
-    + vote_data_csv: *csv containing votes per party per district* CSV-file from the VoteData-folder with columns: [Party, Party, Votes] (see Norwegian_parliament_election_2021.csv).
-    + district_data_csv: *csv containing mandates per district* CSV-file from the DistrictData-folder with columns: [Party, Mandates] (see Norwegian_mandates_per_district.csv).
-    + party_data_csv: *csv containing English name and color per party* CSV-file from the PartyData-folder with columns: [Party, EnglishName, Color] (see Norwegian_party_data.csv).
+    + election_data_csv: *csv containing votes per party per district* CSV-file from the Election Data-folder with columns: [District, Party, Votes] (see Norwegian_parliament_election_2021.csv).
+    + district_data_csv: *csv containing mandates per district* CSV-file from the District Data-folder with columns: [Party, Mandates] (see Norwegian_districts.csv).
+    + party_data_csv: *csv containing English name and color per party* CSV-file from the Party Data-folder with columns: [Party, EnglishName, Color] (see Norwegian_parties.csv).
     + map_json: *json feature_collection map of with same districts as rest of data* JSON-file from Maps-folder (see Norway_map.json).
 
-The data must correlate with each other, meaning the *vote_data_csv* must describe the votes from the districts in *district_data_csv* given to the parties in *party_data_csv*.
+The data must correlate with each other, meaning the *election_data_csv* must describe the votes from the districts in *district_data_csv* given to the parties in *party_data_csv*.
 
 Add additional data and maps to the Data-folder using the existing structure if needed for the instance.
 

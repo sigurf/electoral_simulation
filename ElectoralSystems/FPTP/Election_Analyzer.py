@@ -10,15 +10,15 @@ class Election_Analyzer(IElection_Analyzer):
     """
         Initializes the Election Analyzer object holding all useful information including a pandas dataframe of the final parliament distribution.
 
-        @param  instance  a loaded yaml-file found in the Instances directory, specifying the data used.
+        @param  instance  a loaded json-file found in the Instances directory, specifying the data used.
     """
     def __init__(self, instance):
 
         # Dataframes for the raw data found in the instance
-        self.vote_data, self.district_data, self.party_data = Tools.create_dataframes(instance)
+        self.election_data, self.district_data, self.party_data = Tools.create_dataframes(instance)
         
         # Dataframes for all parties and districts
-        self.parties = self.vote_data[self.vote_data["District"] == self.vote_data.loc[0]["District"]]["Party"]
+        self.parties = self.election_data[self.election_data["District"] == self.election_data.loc[0]["District"]]["Party"]
         self.districts = self.district_data["District"]
 
         # Distributed mandates (per district) using the FPTP electoral system
@@ -44,7 +44,7 @@ class Election_Analyzer(IElection_Analyzer):
 
 
             # Find party with most votes in party and the number of mandates they will receive
-            party_receiving_all_mandates = Tools.find_most_popular_party(self.vote_data, district)
+            party_receiving_all_mandates = Tools.find_most_popular_party(self.election_data, district)
             mandates_from_district = self.district_data[self.district_data["District"] == district]["Mandates"].values[0]
             
             # Add district-winner's mandates to the party's total mandates
@@ -66,8 +66,8 @@ class Election_Analyzer(IElection_Analyzer):
 
     # Getters
 
-    def get_vote_data(self):
-        return self.vote_data
+    def get_election_data(self):
+        return self.election_data
     
     def get_districts(self):
         return self.districts
