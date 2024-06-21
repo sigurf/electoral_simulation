@@ -29,6 +29,4 @@ instance = json.load(file)
 file.close()
 
 # Runs simulation and visualizes the result
-visualizer = Visualizer(electoral_system, instance)
-visualizer.show_maps()
-visualizer.show_parliament_distribution()
+Visualizer(electoral_system, instance)

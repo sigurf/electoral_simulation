@@ -53,6 +53,10 @@ class Visualizer:
         json_file_path = os.path.join(current_directory, "..", "Data", "Maps", instance["data"]["map_json"] + ".json")
         with open(json_file_path) as map:
             self.geo_map = json.load(map)
+        
+        # Visualizes maps and charts
+        self.show_maps()
+        self.show_parliament_distribution()
 
 
     """
