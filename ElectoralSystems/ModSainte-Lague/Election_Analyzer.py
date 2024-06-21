@@ -37,12 +37,12 @@ class Election_Analyzer(IElection_Analyzer):
         mandate_distribution = self.find_district_mandate_distribution()        
         distribution_by_district = mandate_distribution[0]
         national_distribution = mandate_distribution[1]
-        levelling_mandates = self.find_levelling_mandates(national_distribution)
+        mandates_at_large = self.find_mandates_at_large(national_distribution)
         party_ratio = [0]*len(self.parties)*len(self.districts)
         for i in range(len(self.districts)):
             district_factor = Tools.find_total_votes(self.election_data, self.districts[i]) / (int(self.district_data[self.district_data["District"] == self.districts[i]]["Mandates"].values[0]) - 1)
             for j in range(len(self.parties)):
-                party_ratio[len(self.parties)*i + j] = int(levelling_mandates[self.parties[j]] > 0) * Tools.find_total_votes(self.election_data, self.districts[i], self.parties[j]) / (2 * mandate_distribution[0][self.districts[i]][j] + 1)  / district_factor
+                party_ratio[len(self.parties)*i + j] = int(mandates_at_large[self.parties[j]] > 0) * Tools.find_total_votes(self.election_data, self.districts[i], self.parties[j]) / (2 * mandate_distribution[0][self.districts[i]][j] + 1)  / district_factor
         mandates_to_party = {}
         for _ in range(len(self.districts)):
 
@@ -64,13 +64,13 @@ class Election_Analyzer(IElection_Analyzer):
                 party_ratio[index] = 0
             
             # Make sure party cannot receive more mandates than they should
-            if mandates_to_party[party_receiving_mandate] == levelling_mandates[party_receiving_mandate]:
+            if mandates_to_party[party_receiving_mandate] == mandates_at_large[party_receiving_mandate]:
                 for index in range(len(self.districts)):
                     party_ratio[index*len(self.parties) + party_index] = 0
             distribution_by_district[district][party_index] += 1
         
         for party in self.parties:
-            national_distribution[party] += levelling_mandates[party]
+            national_distribution[party] += mandates_at_large[party]
         return distribution_by_district
 
     """
@@ -95,7 +95,7 @@ class Election_Analyzer(IElection_Analyzer):
             mandate_distribution[district] = [0]*len(self.parties)
             votes_from_district = votes[votes["District"] == district]
 
-            # Distribute all the district's mandates except one (levelling mandate) one by one by selecting the party with currently highest vote count in the district
+            # Distribute all the district's mandates except one (mandate at large) one by one by selecting the party with currently highest vote count in the district
             for _ in range(int(self.district_data[self.district_data["District"] == district]["Mandates"].iloc[0]) - 1):
 
                 # Find party with most votes in the district currently
@@ -123,16 +123,16 @@ class Election_Analyzer(IElection_Analyzer):
 
 
     """
-        Calculates how the LEVELLING mandates are distributed among the parties for each district.
+        Calculates how the mandates at large are distributed among the parties for each district.
 
         @return         a dictionary {district: [mandates_party1, ... , mandates_partyN], ...} with the mandates per party per district.
                         Both the districts and the parties are organised in alphabetical order (as in the data files).
     """
-    def find_levelling_mandates(self, mandates_from_district, overrepresented_parties = []):
+    def find_mandates_at_large(self, mandates_from_district, overrepresented_parties = []):
         
         """ National mandate distribution
                 - Like find_district_mandate_distribution() but with the entire nation as one district, not for each district. 
-                - Gives the correct number of levelling mandates per district, but not from which district they come from.
+                - Gives the correct number of mandates at large per party, but not from which district they come from.
         """
 
         # All votes in country
@@ -178,25 +178,25 @@ class Election_Analyzer(IElection_Analyzer):
             # Add mandate to party
             mandate_distribution[party_receiving_mandate] += 1
 
-        """ Levelling mandate allocation
-                - Determines which districts the levelling mandates comes from.
+        """ mandate at large allocation
+                - Determines which districts the mandates at large comes from.
         """
 
-        # Add levelling mandates to party and mark overrepresented parties
+        # Add mandates at large to party and mark overrepresented parties
         new_overrepresented_party = False
-        levelling_mandates = {}
+        mandates_at_large = {}
         for party in mandate_distribution.keys():
             if mandate_distribution[party] < mandates_from_district[party] and mandate_distribution[party] > 0:
                 overrepresented_parties.append(party)
                 new_overrepresented_party = True
             else:
-                levelling_mandates[party] = int(Tools.find_total_votes(self.election_data, None, party) / total_votes  >= 0.04) * max(mandate_distribution[party] - mandates_from_district[party], 0)
+                mandates_at_large[party] = int(Tools.find_total_votes(self.election_data, None, party) / total_votes  >= 0.04) * max(mandate_distribution[party] - mandates_from_district[party], 0)
 
         # Start over if overrepresented party is added
         if new_overrepresented_party:
-            return self.find_levelling_mandates(mandates_from_district, overrepresented_parties) 
+            return self.find_mandates_at_large(mandates_from_district, overrepresented_parties) 
         else:
-            return levelling_mandates
+            return mandates_at_large
 
     
     # Getters
