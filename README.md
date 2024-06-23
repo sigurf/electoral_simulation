@@ -34,7 +34,7 @@ pip install -r requirements.txt
 Run simulation of electoral system *system* using instance *instance* with bash console:
 
 ```bash
-python Run <system> <instance>
+python Run *system* *instance*
 ``` 
 
 
