@@ -103,7 +103,8 @@ class Visualizer:
                                 hoverinfo = 'text',
                                 text=vote_distribution
                             )
-        vote_map_layout = go.Layout(title = "<b>" + self.instance + "</b><br><br>Total votes by district and votes to party by district")
+        title_text = "<b style='font-size: 20>" + self.instance + "</b><br><br>Total votes by district and votes to party by district"
+        vote_map_layout = go.Layout(title=go.layout.Title(text=title_text, font=go.layout.title.Font(size=16)))
         return vote_map, vote_map_layout
 
 
@@ -148,7 +149,8 @@ class Visualizer:
                                 showscale=False,
                                 text=mandate_distribution
                             )
-        mandate_map_layout = go.Layout(title = "<b>" + self.instance + "</b><br><br>Party receiving mandates from district using " + self.electoral_system)
+        title_text = "<b style='font-size: 20'>" + self.instance + "</b><br><br>Party receiving mandates from district using " + self.electoral_system
+        mandate_map_layout = go.Layout(title=go.layout.Title(text=title_text, font=go.layout.title.Font(size=16), x=0.5))
         return mandate_map, mandate_map_layout
        
 
@@ -183,5 +185,6 @@ class Visualizer:
 
 
         # Visualizes pie chart showing parliament distribution
-        fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors=colors))], layout=go.Layout(title="<b>" + self.instance + "</b><br><br>Parties in the parliament using " + self.electoral_system))
+        title_text = "<b style='font-size: 20'>" + self.instance + "</b><br><br>Parties in the parliament using " + self.electoral_system + "<br> "
+        fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors=colors),  title=go.pie.Title(text=title_text, font=go.pie.title.Font(size=16)), showlegend=False, textinfo='label+value')])
         fig.show()
